@@ -1,0 +1,76 @@
+
+
+import { useMemo, useEffect } from "react";
+
+import GameLoading from './GameLoading'
+import * as GridConstants from './components/game/GridConstants'
+
+
+
+
+export default function GameCreation(props: any) {
+
+  
+  useMemo(() => {
+
+    const gameStats = {
+      playerName : props.playerName,
+      score : 0,
+      level : 1,
+      startingTile: 0,
+    }
+
+    localStorage.setItem('gameStats', JSON.stringify(gameStats))
+
+
+    const gridConstants = {
+      gridWidthCount : GridConstants.GRIDWIDTHCOUNT,
+      gridHeightCount : GridConstants.GRIDHEIGHTCOUNT,
+      gridCount: GridConstants.GRIDCOUNT,
+
+      hexWidth : GridConstants.HEXWIDTH,
+      hexHeight:  GridConstants.HEXHEIGHT,
+      hexRadius : GridConstants.RADIUS,
+      hexHorizontalSpacing: GridConstants.HORIZONTAL_SPACING,
+      hexVerticalSpacing: GridConstants.VERTICAL_SPACING,
+      gridWidth: GridConstants.GRIDWIDTH,
+      gridHeight: GridConstants.GRIDHEIGHT,
+    }
+
+    localStorage.setItem('gridConstants', JSON.stringify(gridConstants))
+
+    const gridImgAbsolutes = {
+      hexWidthAbsolute: Math.floor(GridConstants.BASEIMGWIDTH / GridConstants.GRIDWIDTH),
+      hexRadiusAbsolute: Math.floor(GridConstants.BASEIMGWIDTH / GridConstants.GRIDWIDTH) / 2,
+      hexHeightAbsolute: Math.floor(Math.floor(baseImg.imgWidth / GridConstants.GRIDWIDTH) / 2.0 * Math.sqrt(3)),
+
+      gridWidthAbsolute:  GridConstants.GRIDWIDTH * Math.floor(baseImg.imgWidth / GridConstants.GRIDWIDTH),
+      gridHeightAbsolute:  GridConstants.GRIDHEIGHT * Math.floor(Math.floor(baseImg.imgWidth / GridConstants.GRIDWIDTH) / 2.0 * Math.sqrt(3)),
+    }
+
+    localStorage.setItem('gridImgAbsolutes', JSON.stringify(gridImgAbsolutes))
+
+    const currentConstellation = {
+      currentTile: GridConstants.STARTING_TILE,
+      neighboursToCurrent: GridConstants.NEIGHBOURS_TO_STARTING,
+
+      currentHexComplete: GridConstants.STARTING_HEX_COMPLETED,
+      currentHexBase: GridConstants.STARTING_HEX_BASE,
+      currentHexGround: GridConstants.STARTING_HEX_GROUND,
+    }
+
+    localStorage.setItem('currentConstellation', JSON.stringify(currentConstellation))
+
+    
+  }, [props.playerName])
+
+
+  return (
+    <>
+        <GameLoading
+        />
+    </>
+  )
+
+  
+}

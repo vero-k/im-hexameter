@@ -1,0 +1,552 @@
+
+//////////////////
+
+
+// function initializeCurrentComponentsTable(props: any): Map<number, ReactNode>{
+//   console.log("inside Initializer")
+
+//   if(props.theGame.startingTile == props.currentTile){
+//     const currentComponentsTable: Map<number, ReactNode> = new Map<number, ReactNode>();
+
+//     theGame.currentHexSet.forEach((hex: HexObject) => {
+//       const current: ReactNode = <GroundHex
+//                         {...props}
+//                         key={hex.tkey}
+//                         tkey={hex.tkey}
+//                         position={[hex.posX, hex.posY, hex.posZ]}
+//                         rotation={[0, - Math.PI / 6, 0]}
+//                         status={hex.status}
+//                       />
+//       currentComponentsTable.set(hex.tkey, current);
+      
+//     })
+
+//     props.theGame.groundComponentsTable = currentComponentsTable;
+//     return currentComponentsTable;
+//   } else {
+
+//     return props.theGame.groundComponentsTable;
+//   }
+  
+
+
+// }
+
+
+// function initializeCurrentComponentsSet(props: any, currentComponentsMap: Map<number, ReactNode>): Set<ReactNode>{
+
+//   if(theGame.startingTile == props.currentTile){
+//     const currentComponentsSet: Set<ReactNode> = new Set<ReactNode>();
+
+//     currentComponentsMap.forEach((value: ReactNode, key: number) => {
+//       currentComponentsSet.add(value)
+//     })
+
+//     props.theGame.groundComponents = currentComponentsSet;
+//     return currentComponentsSet;
+//   } else {
+//     return props.theGame.groundComponents;
+//   }
+  
+
+// }
+
+
+
+// function initialize(props: any){
+  
+//   if(props.theGame.startingTile != props.currentTile){
+//     console.log("initializing arrray AGAIN")
+//     // create new components for those tiles that are newely added
+//     const nextNeighboursSet: Set<HexObject> = new Set(props.theGame.currentHexTable.get(props.currentTile).neighbours);
+
+//     const nextComponentsSet: Set<ReactNode> = props.theGame.groundComponents;
+//     const nextComponentsTable: Map<number, ReactNode> = props.theGame.groundComponentsTable;
+
+//     nextNeighboursSet.forEach((hex: HexObject) => {
+//       if(!nextComponentsTable.has(hex.tkey)){
+//         const current = <GroundHex
+//                         {...props}
+//                         key={hex.tkey}
+//                         tkey={hex.tkey}
+//                         position={[hex.posX, hex.posY, hex.posZ]}
+//                         rotation={[0, - Math.PI / 6, 0]}
+//                         status={hex.status}
+//                       />
+//         nextComponentsSet.add(current);
+//         nextComponentsTable.set(hex.tkey, current);
+//       }
+      
+//     })
+
+
+//     // update component appearance
+
+//     const tilesToBeUpdated: Set<HexObject> = props.theGame.hexSetToBeModifiedNext;
+
+//     tilesToBeUpdated.forEach((hex: HexObject) => {
+//       const oldComponent = nextComponentsTable.get(hex.tkey);
+//       nextComponentsTable.delete(hex.tkey);
+//       nextComponentsSet.delete(oldComponent)
+//       const newComp = <GroundHex
+//                         {...props}
+//                         key={hex.tkey}
+//                         tkey={hex.tkey}
+//                         position={[hex.posX, hex.posY, hex.posZ]}
+//                         rotation={[0, - Math.PI / 6, 0]}
+//                         status={hex.status}
+//                       />
+//       nextComponentsSet.add(newComp)
+//       nextComponentsTable.set(hex.tkey, newComp)
+//     })
+
+    
+
+//     props.theGame.groundComponents = nextComponentsSet;
+//     props.theGame.groundComponentsTable = nextComponentsTable;
+
+//     return nextComponentsSet
+
+//   } else {
+//     console.log("initializing arrray the first time")
+//     let currentComponentsTable: Map<number, ReactNode> = new Map<number, ReactNode>();
+
+//     props.theGame.currentHexSet.forEach((hex: HexObject) => {
+//           let current: ReactNode = <GroundHex
+//                       {...props}
+//                       key={hex.tkey}
+//                       tkey={hex.tkey}
+//                       position={[hex.posX, hex.posY, hex.posZ]}
+//                       rotation={[0, - Math.PI / 6, 0]}
+//                       status={hex.status}
+//                     />
+//           currentComponentsTable.set(hex.tkey, current);
+//     });
+
+//     let currentComponentsSet: Set<ReactNode> = new Set<ReactNode>();
+
+//     currentComponentsTable.forEach((value: ReactNode, key: number) => {
+//       currentComponentsSet.add(value)
+//     });
+
+
+//     props.theGame.groundComponents = currentComponentsSet;
+//     props.theGame.groundComponentsTable = currentComponentsTable;
+//     return currentComponentsSet
+// }
+// }
+
+
+
+
+
+
+
+
+import {Point} from '../Shapes';
+import { GameObject } from '../objects/GameObjects';
+import * as THREE from "three";
+
+
+
+export class HexObject {
+
+    // GRID
+    tkey: number;
+    gridX: number;
+    gridY: number;
+
+    status: string = "regular";
+    
+    // GEOGRAPHY CANVAS
+    posX: number = 0;
+    posY: number = 0;
+    posZ: number = 0;
+    
+    posVect: THREE.Vector3 = new THREE.Vector3()
+    camVect: THREE.Vector3 = new THREE.Vector3()
+
+
+    // STATE
+    base: boolean = false;
+    ground: boolean = false;
+    complete: boolean = false;
+
+
+    // TEXTURES
+    pathBaseOrg: string = "";
+    pathBaseMod: string = "";
+
+
+    // GEOGRAPHY BASE IMAGE
+    center: Point = new Point(-1, -1);
+    top: number = 0;
+    bottom: number = 0;
+    left: number = 0;
+    right: number = 0;
+    
+    // VERTEX 
+    // vertexPoints: Point[] = [];
+
+    // northWestVertex: Point = null;
+    // northEastVertex: Point = null;
+    // eastVertex: Point = null;
+    // southEastVertex: Point = null;
+    // southWestVertex: Point = null;
+    // westVertex: Point = null;
+
+
+    // NEIGHBOURS IN GRID
+    neighbours: HexObject[] = new Array<HexObject>()
+    neighboursPointers: number[] = new Array<number>();
+
+    northNeighbour: HexObject;
+    northEastNeighbour: HexObject;
+    northWestNeighbour: HexObject;
+
+    southNeighbour: HexObject;
+    southEastNeighbour: HexObject;
+    southWestNeighbour: HexObject;
+
+
+    constructor(gridX: number, gridY: number, tkey: number){
+        this.tkey = tkey;
+        this.gridX = gridX;
+        this.gridY = gridY;
+    }
+}
+
+
+
+
+
+
+export class Game {
+
+
+    // hexobjects all
+    hexArray: Array<Array<HexObject>> = new Array<Array<HexObject>>();
+    hexTable: Map<number, HexObject> = new Map<number, HexObject>();
+    hexSet: Set<HexObject> = new Set<HexObject>();
+
+    currentHexTable: Map<number, HexObject> = new Map<number, HexObject>();
+    currentHexSet: Set<HexObject> = new Set<HexObject>();
+
+    currentBasesKeys: Set<number> = new Set<number>;
+    currentGroundsKeys: Set<number> = new Set<number>;
+    currentCompletesKeys: Set<number> = new Set<number>;
+    currentAllKeys: Set<number> = new Set<number>;
+
+    currentTileHex: HexObject = new HexObject(-1, -1, 1);
+
+    // pointers to hexobjects
+    startingTile: number = -1;
+    currentTile: number = -1;
+
+    neighboursToCurrentTile: number[] = new Array<number>();
+
+    hexSetToBeModifiedNext: Set<HexObject> = new Set<HexObject>();
+    
+
+    groundComponents: Set<ReactNode> = new Set<ReactNode>();
+    groundComponentsTable: Map<number, ReactNode> = new Map<number, ReactNode>();
+
+
+    /// image storage
+
+    croppedImagesObject = {};
+
+    imgTable: Map<number, any> = new Map<number, any>();
+
+    
+    /// objects
+
+    currentGameObjectsSet: Set<GameObject> = new Set<GameObject>();
+    currentGameObjectsTable: Map<number, GameObject> = new Map<number, GameObject>();
+
+    
+    constructor(){
+
+
+
+        // Initiating the Hashtables with the data in Starting Constellation (string -> integer)
+
+        this.startingTile = GridConstants.STARTING_CONSTELLATION.startingTile;
+        this.currentTile = GridConstants.STARTING_CONSTELLATION.startingTile;
+
+        let u: number = 0;
+        for(; u < GridConstants.STARTING_CONSTELLATION.baseTiles.length; u++){
+            this.currentBasesKeys.add(GridConstants.STARTING_CONSTELLATION.baseTiles[u])
+            this.currentAllKeys.add(GridConstants.STARTING_CONSTELLATION.baseTiles[u])
+        }
+        
+        for(u = 0; u < GridConstants.STARTING_CONSTELLATION.groundTiles.length; u++){
+            this.currentGroundsKeys.add(GridConstants.STARTING_CONSTELLATION.groundTiles[u])
+            this.currentAllKeys.add(GridConstants.STARTING_CONSTELLATION.groundTiles[u])
+        }
+
+        for(u = 0; u < GridConstants.STARTING_CONSTELLATION.completeTiles.length; u++){
+            this.currentCompletesKeys.add(GridConstants.STARTING_CONSTELLATION.completeTiles[u])
+        }
+
+
+        // Initializing the hexArray and creating all HexObjects
+        let i: number = 0;
+        let w: number = 0;
+        let h: number = 0;
+
+
+        for(; w < this.gridWidthCount; w++){
+            this.hexArray[w] = []
+            for(h = 0; h < this.gridHeightCount; h++){
+                let current: HexObject = new HexObject(
+                    w * 1.0, h * 1.0, i
+                )
+                
+                if(this.currentCompletesKeys.has(i)){
+                    current.complete = true;
+                    current.base = true;
+                    current.ground = true;
+                } else if(this.currentBasesKeys.has(i)){
+                    current.base = true;
+
+                } else if(this.currentGroundsKeys.has(i)){
+                    current.ground = true;
+                }
+
+                current.pathBaseOrg = 'textures/basehextextures/fi' + w + '' + h + ".jpg"
+                
+                this.hexArray[w].push(current)
+                i++;
+            }
+        }
+
+    }
+
+
+
+        
+
+        // Initializing HashTable for all HexObjects
+        
+        initializingDataStructures(){
+
+            for(let w = 0; w < this.hexArray.length; w++){
+                for(let h = 0; h < this.hexArray[0].length; h++){
+                    this.hexTable.set(this.hexArray[w][h].tkey, this.hexArray[w][h])
+                    this.hexSet.add(this.hexArray[w][h])
+                }
+            }
+            
+            this.currentTileHex = this.hexTable.get(this.currentTile);
+            this.currentTileHex.status = "current";
+    
+            
+    
+    
+            // Adding Grid Data to HexObjects. Adding Center, and Neighbours 
+            let currentHex: HexObject = this.hexArray[0][0];
+            let nextHex: HexObject = this.hexArray[0][1];
+    
+            let northHex: HexObject = new HexObject(-1, -1, -1);
+            let northWestHex: HexObject = new HexObject(-1, -1, -1);
+            let northEastHex: HexObject = new HexObject(-1, -1, -1);
+    
+    
+            currentHex.center = new Point(this.hexRadiusAbsolute, this.hexRadiusAbsolute)
+            currentHex.top = 0;
+            currentHex.left = 0;
+            currentHex.right = this.hexWidthAbsolute;
+            currentHex.bottom = this.hexHeightAbsolute;
+    
+            currentHex.posX = this.hexRadius * 1.0;
+            currentHex.posZ = this.hexRadius * 1.0;
+    
+            for(let h = 1; h < this.gridHeightCount; h++){
+                nextHex = this.hexArray[0][h];
+                nextHex.center = new Point(currentHex.center.x, currentHex.center.y + this.hexHeightAbsolute)
+                nextHex.posX = currentHex.posX;
+                nextHex.posZ = currentHex.posZ + this.hexHeight;
+    
+                currentHex.top = h * this.hexHeightAbsolute;
+                currentHex.left = 0;
+                currentHex.right = this.hexWidthAbsolute;
+                currentHex.bottom = (h+1) * this.hexHeightAbsolute;
+    
+                currentHex.neighboursPointers.push(nextHex.tkey)
+                currentHex.neighbours.push(nextHex);
+                currentHex.southNeighbour = nextHex;
+                nextHex.neighboursPointers.push(currentHex.tkey)
+                nextHex.neighbours.push(currentHex);
+                nextHex.northNeighbour = currentHex;
+    
+                currentHex = nextHex;
+            }
+    
+            
+            for(let h = 0; h < this.gridHeightCount; h++){
+    
+                currentHex = this.hexArray[0][h]
+    
+                for(let w = 1; w < this.gridWidthCount; w++){
+    
+                    nextHex = this.hexArray[w][h];
+                    nextHex.center = new Point(
+                        currentHex.center.x + this.hexWidthAbsolute * 3.0 / 4.0,
+                        currentHex.center.y - Math.pow(-1, w)  * (this.hexHeightAbsolute / 2.0 ) 
+                    )
+                    nextHex.posX = currentHex.posX + this.hexWidth * 3.0 / 4.0;
+                    nextHex.posZ = currentHex.posZ  - Math.pow(-1, w)  * (this.hexHeight / 2.0 );   
+    
+                    currentHex.neighboursPointers.push(nextHex.tkey)
+                    nextHex.neighboursPointers.push(currentHex.tkey)
+                    currentHex.neighbours.push(nextHex);
+                    nextHex.neighbours.push(currentHex);
+    
+                    if(w % 2 == 1){
+                        currentHex.southEastNeighbour = nextHex;
+                        nextHex.northWestNeighbour = currentHex;
+    
+                        if(h > 0){
+                            northHex = this.hexArray[w][h-1];
+                            northHex.neighbours.push(nextHex);
+                            northHex.southNeighbour = nextHex;
+                            nextHex.neighbours.push(northHex);
+                            nextHex.northNeighbour = northHex;
+    
+                            northHex.neighboursPointers.push(nextHex.tkey)
+                            nextHex.neighboursPointers.push(northHex.tkey)
+                        }
+                    } else {
+                        currentHex.northEastNeighbour = nextHex;
+                        nextHex.southWestNeighbour = currentHex;
+    
+                        if(h > 0){
+                            northHex = this.hexArray[w][h-1];
+                            northHex.neighbours.push(nextHex);
+                            northHex.southNeighbour = nextHex;
+                            nextHex.neighbours.push(northHex);
+                            nextHex.northNeighbour = northHex;
+    
+                            northHex.neighboursPointers.push(nextHex.tkey)
+                            nextHex.neighboursPointers.push(northHex.tkey)
+    
+                            northWestHex = this.hexArray[w-1][h-1];
+                            northWestHex.neighbours.push(nextHex);
+                            northWestHex.southEastNeighbour = nextHex;
+                            nextHex.neighbours.push(northWestHex);
+                            nextHex.northWestNeighbour = northWestHex;
+    
+                            northWestHex.neighboursPointers.push(nextHex.tkey)
+                            nextHex.neighboursPointers.push(northWestHex.tkey)
+    
+                            if(w < this.gridWidthCount - 1){
+                                northEastHex = this.hexArray[w+1][h - 1];
+                                northEastHex.neighbours.push(nextHex); 
+                                northEastHex.southWestNeighbour = nextHex;
+                                nextHex.neighbours.push(northEastHex);
+                                nextHex.northEastNeighbour = northEastHex;
+    
+                                northEastHex.neighboursPointers.push(nextHex.tkey)
+                                nextHex.neighboursPointers.push(northEastHex.tkey)
+                            }
+                        }
+                    }
+    
+                    currentHex = nextHex;
+                }
+            }
+    
+            
+            for(let h = 1; h < this.gridHeightCount; h++){
+                currentHex = this.hexArray[0][h];
+                let northWest: HexObject = this.hexArray[1][h-1];
+    
+                currentHex.northWestNeighbour = northWest;
+                northWest.southEastNeighbour = currentHex;
+    
+                currentHex.neighbours.push(northWest);
+                northWest.neighbours.push(currentHex  )
+                
+                currentHex.neighboursPointers.push(northWest.tkey)
+                northWest.neighboursPointers.push(currentHex.tkey)
+    
+    
+            }
+    
+    
+            this.currentAllKeys.forEach((v: number) => {
+                const current: HexObject = this.hexTable.get(v);
+                this.currentHexSet.add(current);
+                this.currentHexTable.set(v, current);
+                current.posVect.add(new THREE.Vector3(current.posX, current.posY, current.posZ))
+                current.camVect.add(new THREE.Vector3(current.posX, current.posY, current.posZ))
+                current.camVect.add(new THREE.Vector3(0, 0.9, -2))
+            })
+            
+    
+    
+            this.neighboursToCurrentTile = this.hexTable.get(this.currentTile).neighboursPointers;
+            
+            for(let b = 0; b < this.neighboursToCurrentTile.length; b++){
+                this.hexTable.get(this.neighboursToCurrentTile[b]).status = "neighbour"
+            }
+            // Populating the hexbase textures folders with image files
+    
+
+        }
+        
+       
+    
+
+   
+
+    makeAStep(steppedOn: number): [Set<HexObject>, Set<HexObject>] {
+
+        let hexModified: Set<HexObject> = new Set<HexObject>();
+
+        let nextCurrent: HexObject = this.hexTable.get(steppedOn);
+        
+        hexModified.add(nextCurrent);
+
+        let prevCurrent: HexObject = this.currentTileHex;
+        prevCurrent.status = 'neighbour';
+        hexModified.add(prevCurrent);
+        
+        let prevNeighbours: number[] = this.neighboursToCurrentTile;
+
+        for(let i=0; i< prevNeighbours.length; i++){
+            const neighbour = this.hexTable.get(prevNeighbours[i]);
+            neighbour.status = "regular";
+            hexModified.add(neighbour);
+        }
+
+        let nextNeighbours: number[] = nextCurrent.neighboursPointers;
+        let nextNeighboursSet: Set<HexObject> = new Set<HexObject>();
+
+        for(let i=0; i< nextNeighbours.length; i++){
+            const neighbour = this.hexTable.get(nextNeighbours[i])
+            neighbour.status = "neighbour";
+
+            this.currentHexSet.add(neighbour);
+            this.currentHexTable.set(nextNeighbours[i], neighbour);
+            this.currentAllKeys.add(nextNeighbours[i])
+
+            nextNeighboursSet.add(neighbour)
+            hexModified.add(neighbour);
+            
+        }
+
+        nextCurrent.status = "current"
+        this.currentTile = steppedOn;
+        this.currentTileHex = nextCurrent;
+        this.neighboursToCurrentTile = this.hexTable.get(steppedOn).neighboursPointers
+
+        return [nextNeighboursSet, hexModified];
+    }
+
+
+}
+
+
+

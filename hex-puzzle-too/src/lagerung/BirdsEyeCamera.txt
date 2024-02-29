@@ -1,0 +1,28 @@
+import {useEffect} from 'react'
+import {useThree} from "@react-three/fiber"
+
+
+
+export const BirdsEyeCamera = (props: any) => {
+
+    const { camera } = useThree();
+    console.log("birdseyecamera change")
+
+    useEffect(() => {
+        console.log("birdseyecamera change in useeffect")
+        
+        camera.position.set(props.gridConstants.gridWidth / 2, props.gridConstants.gridHeight *0.7, props.gridConstants.gridHeight / 2)
+        camera.rotation.set(Math.PI / 2, Math.PI, Math.PI)
+        //camera.rotateX(Math.PI /2)
+        //camera.rotateY(Math.PI )
+        //camera.rotateZ(Math.PI)
+        camera.updateProjectionMatrix()
+
+    }, [])
+
+    return( 
+        <>
+            
+        </>
+    )
+}

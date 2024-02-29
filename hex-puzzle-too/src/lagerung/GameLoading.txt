@@ -1,0 +1,70 @@
+
+import axios from "axios";
+
+import { useEffect, useState } from "react";
+import { useNavigate } from 'react-router-dom';
+
+
+export default function GameLoading(props: any) {
+
+  
+  const navigate = useNavigate();
+
+  const baseURL = "http://127.0.0.1:5000/";
+
+  const payLoad = {
+    imgPath: props.baseImg.imgPath,
+    newHeight: props.baseImg.imgHeight,
+    newWidth: props.baseImg.imgWidth,
+    hexNrWidth: props.gridConstants.gridWidthCount,
+    hexNrHeight: props.gridConstants.gridHeightCount,
+
+  }
+
+  useEffect(() => {
+
+    const loadAsyncStuff = async () => {
+        try {
+            await axios.post(baseURL + "rasterize", payLoad)
+                .then(response => {
+                    axios.get(baseURL + "getimage")
+                    .then(response => {
+                        localStorage.setItem('baseImgRaster', JSON.stringify(response.data))
+                        
+
+                        navigate('/game-in-progress')
+
+                    }).catch(error => {
+                        console.log(error)
+                    })
+
+                }).catch(error => {
+                    console.log(error)
+                })
+
+            
+                
+        } catch (error) {
+            //setError(error);
+            console.log(error)
+        } finally {
+            //setLoaded(true);
+            console.log("finally")
+        }
+    };
+
+    loadAsyncStuff();
+
+  }, [])  
+
+  
+
+    return (
+        <>
+            <div>waiting ...</div>
+        </>
+     )
+
+
+  
+}

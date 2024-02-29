@@ -1,0 +1,31 @@
+
+# dependencies
+hex-puzzle-too/node_modules
+hex-puzzle-too/.pnp
+hex-puzzle-too/.pnp.js
+
+# production
+hex-puzzle-too/build
+
+hex-puzzle-too/env
+
+
+
+hex_backend/venv/
+hex_backend/vscode/
+
+
+hex_backend/__pycache__
+**/__pycache__/
+
+
+hex_backend/database.db
+
+hex_backend/env
+hex_backend/instance/*
+
+hex_backend/hex_be/static/images/baseimg/*
+hex_backend/hex_be/static/images/levelone/*
+hex_backend/hex_be/static/images/leveltwo/*
+hex_backend/hex_be/static/images/levelthree/*
+hex_backend/hex_be/static/images/rastered/*
