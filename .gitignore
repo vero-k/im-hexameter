@@ -32,3 +32,9 @@ hex_backend/hex_be/static/images/levelone/*
 hex_backend/hex_be/static/images/leveltwo/*
 hex_backend/hex_be/static/images/levelthree/*
 hex_backend/hex_be/static/images/rastered/*
+
+!hex_backend/hex_be/static/images/baseimg
+!hex_backend/hex_be/static/images/levelone
+!hex_backend/hex_be/static/images/leveltwo
+!hex_backend/hex_be/static/images/levelthree
+!hex_backend/hex_be/static/images/rastered

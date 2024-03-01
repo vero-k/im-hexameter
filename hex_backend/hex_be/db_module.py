@@ -22,8 +22,9 @@ def close_db():
 def init_db():
     db = get_db()
 
-    with current_app.open_resource('models/schema.sql') as f:
-        db.executescript(f.read().decode('utf8'))
+    if not db_exists():
+        with current_app.open_resource('models/schema.sql') as f:
+            db.executescript(f.read().decode('utf8'))
 
     return db
 
