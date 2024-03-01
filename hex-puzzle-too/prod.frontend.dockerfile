@@ -3,7 +3,7 @@ FROM node:18-alpine AS build
 ENV NODE_ENV production
 ENV GENERATE_SOURCEMAP=false
 ENV NODE_OPTIONS=--max-old-space-size=16384
-ENV REACT_APP_BACKENDURL_PRIO=http://localhost:8000/
+ENV REACT_APP_BACKENDURL_PRIO=http://165.232.81.179:8000/
 
 
 # Create an application directory
