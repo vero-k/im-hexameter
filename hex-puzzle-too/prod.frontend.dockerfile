@@ -13,7 +13,7 @@ RUN mkdir -p /frontend_app
 WORKDIR /frontend_app
 
 # Copy package.json and package-lock.json/yarn.lock files
-COPY package*.json .
+COPY package.json .
 
 RUN npm cache clean --force
 # For npm users

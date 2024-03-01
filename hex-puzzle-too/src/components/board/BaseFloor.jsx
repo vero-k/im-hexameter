@@ -16,6 +16,9 @@ export function BaseHex(props) {
 
   const {visitedTiles, baseImgTable, gridConstants, modTracker} = useContext(GameContext)
   
+  
+  
+
   const visited = visitedTiles.get(tkey)
 
   const trackerTable = baseImgTable.get(tkey)

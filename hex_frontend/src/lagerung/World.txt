@@ -1,0 +1,297 @@
+
+import { useState, useMemo } from "react"
+
+import { Menu } from './components/controlpanels/Menu'
+import {BirdEyeWorld} from './components/world/BirdEyeWorld'
+import { FirstPersonWorld } from "./components/world/FirstPersonWorld"
+import {PerspectiveMenu} from './components/controlpanels/PerspectiveMenu'
+import { EndGameModal } from "./components/controlpanels/EndGameModal"
+import { GameHeader } from "./components/controlpanels/GameHeader"
+
+
+interface HexObject {
+  tkey: number,
+  gridX: number,
+  gridY: number,
+  status: string,
+  posX: number,
+  posY: number,
+  posZ: number,
+  neighbours: Array<number>,
+  neighboursObject: any,
+  neighboursCoord: any,
+  isEdge: boolean,
+  isCorner: boolean,
+  isTop: boolean,
+  isBottom: boolean,
+  isLeft: boolean,
+  isRight: boolean,
+  verticalShiftDown: boolean,
+}
+
+
+export default function World(props: any) {
+
+  const [gameState, setGameState] = useState({birdEye: true})
+  const [modalShow, setModalShow] = useState(false);
+
+
+  const {
+    gameStats,
+    baseImg,
+    baseImgTable,
+    gridConstants,
+    gridImgAbsolutes,
+    currentConstellation,
+    hexArray,
+    hexTable
+  } = useMemo(() => {
+
+    const gameStats = JSON.parse(localStorage.getItem('gameStats'))
+    const baseImgRaster = JSON.parse(localStorage.getItem('baseImgRaster'))
+    const currentConstellation = JSON.parse(localStorage.getItem('currentConstellation'))
+    const gridConstants = JSON.parse(localStorage.getItem('gridConstants'))
+    const gridImgAbsolutes = JSON.parse(localStorage.getItem('gridImgAbsolutes'))
+    const baseImgFile= JSON.parse(localStorage.getItem('baseImageFile'))
+
+    const baseImg = {
+      file : baseImgFile,
+      imgPath : GridConstants.BASEIMGPATH,
+      imgWidth : GridConstants.BASEIMGWIDTH,
+      imgHeight : GridConstants.BASEIMGHEIGHT,
+    }
+
+
+    const baseImgTable = new Map<number, any>()
+
+    for (const [key, value] of Object.entries(baseImgRaster)){
+      const nr = parseInt(key)
+      baseImgTable.set(nr, value)
+    }
+
+    const hexArray: Array<HexObject> = [...Array(gridConstants.gridCount).keys()].map(i => {
+        
+        const x = Math.floor(i / gridConstants.gridHeightCount)
+        const y = i % gridConstants.gridHeightCount
+
+        const posX = gridConstants.hexRadius + x * gridConstants.hexHorizontalSpacing
+        const verticalShiftDown = (x % 2) == 0
+        const verticalShift = (verticalShiftDown)? 0: gridConstants.hexVerticalSpacing / 2.0
+        const posZ = gridConstants.hexRadius + y * gridConstants.hexVerticalSpacing + verticalShift
+        const isTop = y === 0
+        const isBottom = y === (gridConstants.gridHeightCount - 1)
+        const isLeft = x === 0
+        const isRight = x === (gridConstants.gridWidthCount - 1)
+        const isEdge = (isTop || isLeft || isBottom || isRight)
+        const isCorner = (isTop && isLeft) || (isTop && isRight) || (isBottom && isLeft) || (isBottom && isRight)
+        return {
+          tkey: i,
+          gridX: x,
+          gridY: y,
+          posX: posX,
+          posY: 0,
+          posZ: posZ,
+          neighbours: [],
+          neighboursCoord: {},
+          neighboursObject: {},
+          isEdge: isEdge,
+          isCorner: isCorner,
+          isLeft: isLeft,
+          isRight: isRight,
+          isTop: isTop,
+          isBottom: isBottom,
+          verticalShiftDown: verticalShiftDown
+        }
+    })
+
+
+    const hexTable = new Map<number, HexObject>()
+    
+    hexArray.forEach((hex, index) => {
+      hexTable.set(index, hex)
+    })
+
+    hexArray.forEach((hex, index) => {
+      if(!hex.verticalShiftDown){
+          
+          hex.neighboursCoord = {
+              'north': (!hex.isTop)? [hex.gridX, hex.gridY - 1] : null, 
+              'south': (!hex.isBottom)? [hex.gridX, hex.gridY + 1]: null, 
+              'northeast': (!hex.isRight)? [hex.gridX + 1, hex.gridY] : null,
+              'southeast': !(hex.isBottom || hex.isRight)? [hex.gridX + 1, hex.gridY + 1]: null, 
+              'northwest' : !(hex.isLeft)? [hex.gridX -1, hex.gridY]: null, 
+              'southwest' : !(hex.isLeft || hex.isBottom)? [hex.gridX -1, hex.gridY + 1]: null,
+          }
+
+          hex.neighboursObject = {
+            'north': (hex.neighboursCoord.north)? index - 1: null, 
+            'south': (hex.neighboursCoord.south)? index + 1 : null, 
+            'northeast': (hex.neighboursCoord.northeast)? index + gridConstants.gridHeightCount : null, 
+            'southeast' : (hex.neighboursCoord.southeast)? index + gridConstants.gridHeightCount + 1 : null, 
+            'northwest' : (hex.neighboursCoord.northwest)? index - gridConstants.gridHeightCount : null, 
+            'southwest' : (hex.neighboursCoord.southwest)? index - gridConstants.gridHeightCount + 1 : null,
+          }
+
+          if(hex.neighboursCoord.north){
+            hex.neighbours.push(index-1)
+          }
+
+          if(hex.neighboursCoord.south){
+            hex.neighbours.push(index+1)
+          }
+
+          if(hex.neighboursCoord.northeast){
+            hex.neighbours.push(index + gridConstants.gridHeightCount,)
+          }
+
+          if(hex.neighboursCoord.northwest){
+            hex.neighbours.push(index - gridConstants.gridHeightCount)
+          }
+
+          if(hex.neighboursCoord.southeast){
+            hex.neighbours.push(index + gridConstants.gridHeightCount + 1)
+          }
+
+          if(hex.neighboursCoord.southwest){
+            hex.neighbours.push(index - gridConstants.gridHeightCount + 1)
+          }
+
+          
+        
+      } else {
+
+
+        hex.neighboursCoord = {
+          'north': (!hex.isTop)? [hex.gridX, hex.gridY - 1] : null, 
+          'south': (!hex.isBottom)? [hex.gridX, hex.gridY + 1]: null, 
+          'northeast': !(hex.isRight || hex.isTop)? [hex.gridX + 1, hex.gridY -1] : null,
+          'southeast': (!hex.isRight)? [hex.gridX + 1, hex.gridY]: null, 
+          'northwest' : !(hex.isLeft || hex.isTop)? [hex.gridX -1, hex.gridY-1]: null, 
+          'southwest' : (!hex.isLeft)? [hex.gridX -1, hex.gridY]: null,
+      }
+
+      hex.neighboursObject = {
+        'north': (hex.neighboursCoord.north)? index - 1: null, 
+        'south': (hex.neighboursCoord.south)? index + 1 : null, 
+        'northeast': (hex.neighboursCoord.northeast)? index + gridConstants.gridHeightCount - 1 : null, 
+        'southeast' : (hex.neighboursCoord.southeast)? index + gridConstants.gridHeightCount : null, 
+        'northwest' : (hex.neighboursCoord.northwest)? index - gridConstants.gridHeightCount -1 : null, 
+        'southwest' : (hex.neighboursCoord.southwest)? index - gridConstants.gridHeightCount : null,
+      }
+
+      if(hex.neighboursCoord.north){
+        hex.neighbours.push(index-1)
+      }
+
+      if(hex.neighboursCoord.south){
+        hex.neighbours.push(index+1)
+      }
+
+      if(hex.neighboursCoord.northeast){
+        hex.neighbours.push(index + gridConstants.gridHeightCount -1,)
+      }
+
+      if(hex.neighboursCoord.northwest){
+        hex.neighbours.push(index - gridConstants.gridHeightCount -1)
+      }
+
+      if(hex.neighboursCoord.southeast){
+        hex.neighbours.push(index + gridConstants.gridHeightCount)
+      }
+
+      if(hex.neighboursCoord.southwest){
+        hex.neighbours.push(index - gridConstants.gridHeightCount)
+      }
+
+    }})
+
+
+    currentConstellation.neighboursToCurrent = hexTable.get(currentConstellation.currentTile).neighbours
+    hexArray.forEach((hex, index) => {
+      const isCurrent = (index === currentConstellation.current)? true: false
+      const isNeighbour = currentConstellation.neighboursToCurrent.includes(index)? true : false 
+      const status = isCurrent? "current" : (isNeighbour? "neighbour":"regular")
+      hex.status = status
+    })
+
+
+    return {
+      gameStats,
+      baseImg,
+      baseImgTable,
+      gridConstants,
+      gridImgAbsolutes,
+      currentConstellation,
+      hexArray,
+      hexTable,
+    }
+  }, [])
+
+
+  
+
+
+  return (
+      <>
+        <div
+           style={{ width: "100vw", height: "100vh" }}
+        >
+
+          <GameHeader 
+            modalctrl={() => setModalShow(true)}
+          />
+
+          <EndGameModal 
+            show={modalShow}
+            onHide={() => setModalShow(false)}
+          />
+
+          <PerspectiveMenu 
+            changePerspective={() => setGameState((prev) => {
+              return(
+                {
+                  ...prev,
+                  'birdEye' : !prev['birdEye']
+                }
+              )
+            })}
+          />
+
+          <Menu {...props}
+          />
+
+        
+          {gameState['birdEye'] && <BirdEyeWorld 
+          {...props}
+          gameStats={gameStats}
+          baseImg={baseImg}
+          baseImgTable={baseImgTable}
+          gridConstants={gridConstants}
+          gridAbsolutes={gridImgAbsolutes}
+          currentConstellation={currentConstellation}
+          hexArray={hexArray}
+          hexTable={hexTable}
+          />
+          
+          }
+
+          {!gameState['birdEye']  && <FirstPersonWorld 
+          {...props}
+          gameStats={gameStats}
+          baseImg={baseImg}
+          baseImgTable={baseImgTable}
+          gridConstants={gridConstants}
+          gridAbsolutes={gridImgAbsolutes}
+          currentConstellation={currentConstellation}
+          hexArray={hexArray}
+          hexTable={hexTable}
+          />
+          }
+
+
+        </div>
+        
+      </>
+
+  )
+}

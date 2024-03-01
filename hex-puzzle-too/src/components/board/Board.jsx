@@ -19,7 +19,7 @@ export default function Board(props){
         return degree * (Math.PI / 180)
     }
 
-    
+    // eslint-disable-next-line
     const {
     gl, // WebGL renderer
     scene, // Default scene

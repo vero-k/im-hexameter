@@ -1,0 +1,76 @@
+import BackGround from "./BackGround"
+import Board from "../board/Board"
+import {Player} from "../player/Player"
+
+import * as THREE from "three"
+
+import { Sky } from "@react-three/drei"
+
+import { Canvas} from "@react-three/fiber"
+import { EffectComposer, DepthOfField, Bloom, Noise, Vignette } from '@react-three/postprocessing'
+
+import { PerspectiveCamera } from '@react-three/drei'
+import { BirdsEyeCamera } from "../camera/BirdsEyeCamera"
+import { FirstPersonCamera } from "../camera/FirstPersonCamera"
+import { useState } from "react"
+
+
+
+export const World = (props: any) => {
+
+    console.log("render World")
+    const isBirdEye = props.isBirdEye
+    
+    const [currentTile, setCurrentTileParent] = useState(props.currentConstellation.currentTile)
+
+
+    return (
+        <>
+
+            <Canvas>
+
+                <PerspectiveCamera/> 
+
+                {isBirdEye && <BirdsEyeCamera 
+                {...props}
+                centerX={props.centerX}
+                centerY={props.centerY}
+                zoom={props.zoom}
+                />}
+
+                {!isBirdEye && <FirstPersonCamera 
+                {...props} 
+                currentTile={currentTile}
+                centerX={props.centerX}
+                centerY={props.centerY}
+                zoom={props.zoom}
+                />}
+
+                
+
+                <ambientLight color={"white"} intensity={0.5} />
+
+                <primitive object={new THREE.AxesHelper(100)} />
+                
+                {isBirdEye && <gridHelper args={[200, 200, `white`, `gray`]}/>}
+                {!isBirdEye && <gridHelper args={[200, 200, `blue`, `pink`]}/> }
+
+                <Player />
+
+                <Board 
+                {...props}
+                rotation={[0, 0, 0]}
+                position={[0, 0, -10]}
+                setCurrentTileParent={setCurrentTileParent}
+                />
+
+                
+                
+            
+
+            
+            </Canvas>
+        
+        </>
+    )
+}
