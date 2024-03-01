@@ -1,6 +1,5 @@
 
 FROM node:18-alpine AS build
-ENV NODE_ENV production
 ENV GENERATE_SOURCEMAP=false
 ENV NODE_OPTIONS=--max-old-space-size=16384
 ENV REACT_APP_BACKENDURL_PRIO=http://im-hexameter-drauf.site:8000/
@@ -22,7 +21,7 @@ RUN npm install
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
 
-RUN GENERATE_SOURCEMAP=false npm run build --omit=dev
+RUN npm run build
 
 RUN rm -rf /usr/share/nginx/html/*
 

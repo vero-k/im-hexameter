@@ -23,7 +23,9 @@
     "react-router-dom": "^6.21.2",
     "react-scripts": "^5.0.1",
     "three": "^0.160.0",
-    "web-vitals": "^2.1.4"
+    "web-vitals": "^2.1.4",
+    "workbox-build": "^7.0.0",
+    "workbox-webpack-plugin": "^7.0.0"
   },
   "scripts": {
     "start": "react-scripts start",
@@ -51,12 +53,14 @@
   },
   "overrides": {},
   "devDependencies": {
-    "@babel/core": "7.22.5",
+    "@babel/core": "^7.22.5",
     "@babel/eslint-parser": "7.22.5",
     "@babel/plugin-proposal-private-property-in-object": "^7.21.11",
     "@babel/plugin-transform-private-property-in-object": "^7.23.4",
     "@babel/plugin-transform-unicode-property-regex": "^7.23.3",
-    "@babel/preset-env": "7.22.5"
+    "@babel/preset-env": "7.22.5",
+    "@rollup/plugin-babel": "^6.0.4",
+    "babel-preset-react-app": "^10.0.1"
   },
   "plugins": [
     [
