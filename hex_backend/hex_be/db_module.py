@@ -41,3 +41,10 @@ def db_exists():
         return False
     else:
         return False
+    
+
+
+def reset_db():
+    db = get_db()
+    with current_app.open_resource('models/reset.sql') as f:
+        db.executescript(f.read().decode('utf8'))
