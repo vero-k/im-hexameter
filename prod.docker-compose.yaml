@@ -1,13 +1,22 @@
 version: '3.8'
 services:
-  frontend:
-    image: frontend_img_prod
-    ports:
-      - 80:80
-    depends_on:
-      - backend
-    
   backend:
-    image:  backend_img_prod
+    image:  backend_img_prod:latest
     ports:
       - 8000:8000
+    networks:
+      - appnet
+        
+  frontend:
+    image: frontend_img_prod:latest
+    ports:
+      - 80:80
+    networks:
+      - appnet
+    depends_on:
+      - backend
+  
+networks:
+  appnet:
+    driver: bridge
+  

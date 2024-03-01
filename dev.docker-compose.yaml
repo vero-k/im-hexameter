@@ -1,12 +1,12 @@
 version: '3.8'
 services:
   frontend:
-    image: frontend_img
+    image: frontend_img:latest
     ports:
       - 3000:3000
     depends_on:
       - backend
   backend:
-    image:  backend_img
+    image:  backend_img:latest
     ports:
       - 5000:5000
