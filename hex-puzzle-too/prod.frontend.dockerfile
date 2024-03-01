@@ -22,7 +22,7 @@ RUN npm install
 # Copy the rest of your app's source code from your host to your image filesystem.
 COPY . .
 
-RUN npm run build --prod
+RUN GENERATE_SOURCEMAP=false npm run build --omit=dev
 
 RUN rm -rf /usr/share/nginx/html/*
 
